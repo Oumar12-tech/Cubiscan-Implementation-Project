@@ -54,12 +54,48 @@ define(['N/error', 'N/record', 'N/runtime', 'N/search', 'N/task', '/.bundle/1321
 
                         try {
 
+
+
                                 var items = parms.itemArray ;
+
+                                var firstItem = items[0];
+
+                                var itemSearchObj = search.create({
+   type: "item",
+   filters:
+   [
+      ["internalid","anyof",firstItem]
+   ],
+   columns:
+   [
+      search.createColumn({name: "internalid", label: "Internal ID"})
+   ]
+});
+
+                                var searchResultCount = itemSearchObj.run().getRange(0,1);
+
+                                var itemTypeUpdate = searchResultCount[0].recordType;
+
+                                var itemTypeInfo = parms.itemType;
+
+                                if (itemTypeInfo == 'Assembly'){
+                                    var itemTypeSet = record.Type.ASSEMBLY_ITEM;
+
+                                }
+                                else if (itemTypeInfo == 'InvtPart'){
+                                    var itemTypeSet = record.Type.INVENTORY_ITEM;
+                                }
                                 for (i = 0; i < items.length; i++){
+
+
+                                    log.debug('itemType', items[i]);
+                                    log.debug('itemTypeSet', itemTypeSet);
+
                                     var itemRecord = record.load({
-                                        type: 'inventoryitem',
+                                        type: itemTypeUpdate,
                                         id: items[i]
                                     });
+
 
                                     itemRecord.setValue({
                                         fieldId: 'custitem_pacejet_item_height',
@@ -85,6 +121,18 @@ define(['N/error', 'N/record', 'N/runtime', 'N/search', 'N/task', '/.bundle/1321
                                         fieldId: 'custitem_wpsg_pack_profile',
                                         value: parms.PackageProfile
                                     });
+
+                                    if (i == 0){
+                                        itemRecord.setValue({
+                                            fieldId: 'custitem_wpsg_dimension_update_type',
+                                            value: 8 //Scanner
+                                        });
+                                    } else {
+                                        itemRecord.setValue({
+                                            fieldId: 'custitem_wpsg_dimension_update_type',
+                                            value: 9 //Scanner Sibling
+                                        });
+                                    }
 
                                     //log.debug({title: 'Package Profile', details: parms.PackageProfile});
 
