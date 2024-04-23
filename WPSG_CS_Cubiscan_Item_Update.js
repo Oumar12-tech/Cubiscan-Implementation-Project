@@ -84,7 +84,7 @@ define(['N/search', 'N/ui/dialog', 'N/url', 'N/currentRecord'],
 
 
         function submitItems(context) {
-            //figuring out
+            
         }
 
         return {
